@@ -16,9 +16,7 @@ Board::Board(const Vector2Int& dimensions)
 		tiles[i] = std::vector<int>(dimensions.y);
 
 	/* Set all tiles to 0 */
-	for (size_t i = 0; i < tiles.size(); ++i)
-		for (size_t j = 0; j < tiles[i].size(); ++j)
-			tiles[i][j] = 0;
+	reset();
 }
 
 void Board::set_move(Vector2Int tile, int index)
@@ -142,4 +140,12 @@ int Board::check_win() const
 	}
 
 	return 0;
+}
+
+void Board::reset()
+{
+	/* Set all tiles to zero */
+	for (int i = 0; i < dimensions.x; ++i)
+		for (int j = 0; j < dimensions.y; ++j)
+			tiles[i][j] = 0;
 }

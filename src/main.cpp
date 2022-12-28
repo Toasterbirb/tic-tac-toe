@@ -1,9 +1,14 @@
 #include <vector>
 #include "BotPlayer.hpp"
+#include "Color.hpp"
+#include "Font.hpp"
+#include "Input.hpp"
 #include "Player.hpp"
 #include "Birb2D.hpp"
 #include "Board.hpp"
 #include "HumanPlayer.hpp"
+#include "Vector/Vector2.hpp"
+#include "Vector/Vector2Int.hpp"
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 
 
@@ -18,6 +23,7 @@ static void post_render();
 static void cleanup();
 
 /* Game variables */
+bool reset_game = false;
 bool game_over = false;
 Board board;
 int current_player = 0;
@@ -36,6 +42,13 @@ Color tile_colors[2] = {
 	Colors::Nord::PolarNight::nord2
 };
 std::vector<std::vector<Entity>> board_tile_entities;
+
+/* Game over screen */
+Font* free_mono_big;
+Font* free_mono_small;
+Scene game_over_scene;
+Entity game_over_text;
+Entity restart_text;
 
 int main(void)
 {
@@ -57,6 +70,31 @@ int main(void)
 	return 0;
 }
 
+void update_game_over_scene_position(Game& game)
+{
+	/* Make sure that the game over text is centered */
+	int height = game.window->dimensions.y / 2.0 - 32;
+	game_over_text.rect = Vector2(game.window->dimensions.x / 2.0 - game_over_text.textComponent.text.size() * 19, height).ToInt();
+	restart_text.rect 	= Vector2(game.window->dimensions.x / 2.0 - 240, height + 64).ToInt();
+}
+
+void reset_board_colors()
+{
+	int cur_color = 0;
+	for (int i = 0; i < board.dimensions.x; ++i)
+	{
+		for (int j = 0; j < board.dimensions.y; ++j)
+		{
+			board_tile_entities[i][j].rect.color = tile_colors[cur_color];
+
+			if (cur_color == 0)
+				cur_color = 1;
+			else
+				cur_color = 0;
+		}
+	}
+}
+
 /* start() is called before the game loop starts.
  * Useful for doing stuff that will only run once before
  * the game starts */
@@ -64,6 +102,26 @@ void start(Game& game)
 {
 	//Splash splash(*game.window);
 	//splash.Run();
+	
+	/* Load any resources */
+	free_mono_big = new Font();
+	free_mono_big->LoadFont("fonts/FreeMono.ttf", 64);
+
+	free_mono_small = new Font();
+	free_mono_small->LoadFont("fonts/FreeMonoBold.ttf", 40);
+
+	/* Create the game over scene */
+	game_over_scene.Deactivate();
+
+	EntityComponent::Text game_over_textcomponent("Game over", free_mono_big, &Colors::Nord::SnowStorm::nord4);
+	game_over_text = Entity("Game over text", Vector2Int(0, 0), game_over_textcomponent);
+	game_over_scene.AddObject(&game_over_text);
+
+	EntityComponent::Text restart_game_textcomponent("Press 'r' to restart", free_mono_small, &Colors::Nord::SnowStorm::nord4);
+	restart_text = Entity("Restart game", Vector2Int(0, 0), restart_game_textcomponent);
+	game_over_scene.AddObject(&restart_text);
+
+	update_game_over_scene_position(game);
 
 	/* Create the board */
 	board = Board({ 3, 3 });
@@ -78,23 +136,17 @@ void start(Game& game)
 
 	/* Create the visual board tiles */
 	board_tile_entities = std::vector<std::vector<Entity>>(board.dimensions.x);
-	int cur_color = 0;
 	for (int i = 0; i < board.dimensions.x; ++i)
 	{
 		for (int j = 0; j < board.dimensions.y; ++j)
 		{
 			Rect tile_rect(i * TILE_SIZE, j * TILE_SIZE, TILE_SIZE, TILE_SIZE);
 			Entity board_tile("Board tile", tile_rect, 1);
-			board_tile.rect.color = tile_colors[cur_color];
-
 			board_tile_entities[i].push_back(board_tile);
-
-			if (cur_color == 0)
-				cur_color = 1;
-			else
-				cur_color = 0;
 		}
 	}
+
+	reset_board_colors();
 
 	/* Add the board tile entities to the board scene */
 	for (size_t i = 0; i < board_tile_entities.size(); ++i)
@@ -130,6 +182,9 @@ void input(Game& game)
 				break;
 		}
 	}
+
+	if (game.window->key_event() == Input::KeyCode::R)
+		reset_game = true;
 }
 
 /* update() is called after input has been handled and
@@ -137,6 +192,18 @@ void input(Game& game)
  * logic that needs to be updated before rendering */
 void update(Game& game)
 {
+	/* Check if a game reset is queued */
+	if (reset_game)
+	{
+		reset_game = false;
+		game_over = false;
+		game_over_scene.Deactivate();
+		current_player = 0;
+
+		board.reset();
+		reset_board_colors();
+	}
+
 	/* Make move */
 	if (!game_over)
 	{
@@ -153,8 +220,11 @@ void update(Game& game)
 			int winner = board.check_win();
 			if (winner != 0)
 			{
+				game_over_text.SetText(players[winner - 1]->name + " won!");
 				std::cout << "Player '" << players[winner - 1]->name << "' has won!" << std::endl;
 				game_over = true;
+
+				game_over_scene.Activate();
 			}
 
 			/* Give the turn to the next player */
@@ -164,6 +234,10 @@ void update(Game& game)
 
 		if (current_player >= 2)
 			current_player = 0;
+	}
+	else
+	{
+		update_game_over_scene_position(game);
 	}
 }
 
@@ -177,6 +251,7 @@ void render(Game& game)
 	Render::DrawRect(Rect(0, 0, game.window->dimensions.x, game.window->dimensions.y, Colors::Nord::PolarNight::nord0));
 
 	board_scene.Render();
+	game_over_scene.Render();
 }
 
 /* post_render() will be called after rendering has finished
@@ -195,5 +270,6 @@ void post_render()
  * cleanup that is necessary, like freeing heap allocations etc. */
 void cleanup()
 {
-
+	delete free_mono_small;
+	delete free_mono_big;
 }

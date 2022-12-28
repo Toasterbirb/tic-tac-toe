@@ -18,6 +18,8 @@ public:
 	void set_move(Birb::Vector2Int tile, int index);
 	bool is_legal_move(Birb::Vector2Int tile) const;
 	int tile_count() const;
-
 	int check_win() const;
+
+	void reset();
 };
+
