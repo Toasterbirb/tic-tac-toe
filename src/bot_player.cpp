@@ -56,6 +56,7 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 		if (winner == this->index)
 		{
 			sel_tile = i;
+			break;
 		}
 	}
 
