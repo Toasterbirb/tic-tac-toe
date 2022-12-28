@@ -22,7 +22,7 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 	 * bot makes up its own mind ;) */
 
 	/* Find all legal moves */
-	std::vector<Vector2Int> legal_moves;
+	std::vector<Vector2Int> legal_moves = find_legal_moves(board);
 	for (int i = 0; i < board->dimensions.x; ++i)
 	{
 		for (int j = 0; j < board->dimensions.y; ++j)
@@ -92,4 +92,19 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 
 	board->set_move(legal_moves[sel_tile], index);
 	return legal_moves[sel_tile];
+}
+
+std::vector<Birb::Vector2Int> Bot::find_legal_moves(Board* board)
+{
+	std::vector<Vector2Int> legal_moves;
+	for (int i = 0; i < board->dimensions.x; ++i)
+	{
+		for (int j = 0; j < board->dimensions.y; ++j)
+		{
+			Vector2Int pos(i, j);
+			if (board->is_legal_move(pos))
+				legal_moves.push_back(pos);
+		}
+	}
+	return legal_moves;
 }
