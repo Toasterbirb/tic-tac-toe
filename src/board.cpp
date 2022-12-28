@@ -1,4 +1,5 @@
 #include "Board.hpp"
+#include "Vector/Vector2Int.hpp"
 #include <vector>
 
 using namespace Birb;
@@ -18,6 +19,13 @@ Board::Board(const Vector2Int& dimensions)
 	for (size_t i = 0; i < tiles.size(); ++i)
 		for (size_t j = 0; j < tiles[i].size(); ++j)
 			tiles[i][j] = 0;
+}
+
+void Board::set_move(Vector2Int tile, int index)
+{
+	/* Check if the move is legal */
+	if (is_legal_move(tile))
+		tiles[tile.x][tile.y] = index;
 }
 
 bool Board::is_legal_move(Vector2Int tile) const

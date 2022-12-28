@@ -1,3 +1,4 @@
+#include "Vector/Vector2Int.hpp"
 #include <vector>
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #include "BotPlayer.hpp"
@@ -19,8 +20,6 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 	/* Ignore the given tile position since the
 	 * bot makes up its own mind ;) */
 
-	/* Choose a random legal move for now */
-
 	/* Find all legal moves */
 	std::vector<Vector2Int> legal_moves;
 	for (int i = 0; i < board->dimensions.x; ++i)
@@ -39,9 +38,30 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 		return { -1, -1 };
 	}
 
-	/* Pick a random legal move */
-	int sel_tile = rand.RandomInt(0, legal_moves.size() - 1);
-	board->tiles[legal_moves[sel_tile].x][legal_moves[sel_tile].y] = this->index;
+	/* Go trough all of the legal moves */
+	int sel_tile = -1;
+	for (size_t i = 0; i < legal_moves.size(); ++i)
+	{
+		/* Create a copy of the current board */
+		Board temp_board = *board;
 
+		/* Try a move */
+		temp_board.set_move(legal_moves[i], this->index);
+
+		/* Check if the move would result in a win */
+		int winner = temp_board.check_win();
+
+		/* Check if the bot was a winner */
+		if (winner == this->index)
+		{
+			sel_tile = i;
+		}
+	}
+
+	/* Pick a random legal move if no good moves were found */
+	if (sel_tile == -1)
+		sel_tile = rand.RandomInt(0, legal_moves.size() - 1);
+
+	board->set_move(legal_moves[sel_tile], index);
 	return legal_moves[sel_tile];
 }

@@ -15,6 +15,7 @@ public:
 	 * tile. 0 means empty */
 	std::vector<std::vector<int>> tiles;
 
+	void set_move(Birb::Vector2Int tile, int index);
 	bool is_legal_move(Birb::Vector2Int tile) const;
 	int tile_count() const;
 

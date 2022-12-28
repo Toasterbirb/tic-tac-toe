@@ -66,7 +66,7 @@ void start(Game& game)
 	//splash.Run();
 
 	/* Create the board */
-	board = Board({ 9, 5 });
+	board = Board({ 3, 3 });
 
 	/* Initialize the players */
 	players = std::vector<Player*>(2);
