@@ -43,7 +43,7 @@ int main(void)
 	window_options.title 				= "Game";
 	window_options.window_dimensions 	= { 1280, 720 };
 	window_options.refresh_rate 		= 75;
-	window_options.resizable 			= false;
+	window_options.resizable 			= true;
 
 	Game game_loop(window_options, start, input, update, render);
 
