@@ -25,7 +25,7 @@ std::vector<Player*> players;
 
 Human human("Player", &board, 1);
 //Human human2("Player 2", &board, 2);
-Bot bot("Mr. Robot", &board, 2);
+Bot bot("Mr. Robot", &board, 2, 2);
 
 Vector2Int human_move = { -1, -1 };
 

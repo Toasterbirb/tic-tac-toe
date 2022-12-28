@@ -7,12 +7,13 @@ using namespace Birb;
 
 Bot::Bot() {}
 
-Bot::Bot(const std::string& name, Board* board, int index)
+Bot::Bot(const std::string& name, Board* board, int index, int player_count)
 {
 	this->name 	= name;
 	this->board = board;
 	this->index = index;
 	this->type 	= Player::PlayerType::Bot;
+	this->player_count = player_count;
 }
 
 Vector2Int Bot::MakeMove(Vector2Int tile)
@@ -55,6 +56,32 @@ Vector2Int Bot::MakeMove(Vector2Int tile)
 		if (winner == this->index)
 		{
 			sel_tile = i;
+		}
+	}
+
+	/* Find any winning moves that other players might have and
+	 * make sure to block them */
+	if (sel_tile == -1)
+	{
+		for (int j = 1; j < player_count; ++j)
+		{
+			for (size_t i = 0; i < legal_moves.size(); ++i)
+			{
+				/* Create a copy of the current board */
+				Board temp_board = *board;
+
+				/* Try a move */
+				temp_board.set_move(legal_moves[i], j);
+
+				/* Check if the move would result in a win */
+				int winner = temp_board.check_win();
+
+				/* Check if the player was a winner */
+				if (winner == j)
+				{
+					sel_tile = i;
+				}
+			}
 		}
 	}
 
