@@ -1,4 +1,5 @@
 #include <vector>
+#include "AssetManager.hpp"
 #include "BotPlayer.hpp"
 #include "Color.hpp"
 #include "Font.hpp"
@@ -21,6 +22,8 @@ static void update(Game& game);
 static void render(Game& game);
 static void post_render();
 static void cleanup();
+
+AssetManager assets;
 
 /* Game variables */
 Game* global_game;
@@ -147,6 +150,7 @@ void start(Game& game)
 	game.window->OnWindowResize = OnWindowResize;
 
 	/* Load any resources */
+	assets.InitializeBundledAssets();
 	free_mono_big = new Font();
 	free_mono_big->LoadFont("fonts/FreeMono.ttf", 64);
 
@@ -335,4 +339,7 @@ void cleanup()
 {
 	delete free_mono_small;
 	delete free_mono_big;
+
+	/* Free the assets bundle */
+	assets.FreeBundledAssets();
 }
