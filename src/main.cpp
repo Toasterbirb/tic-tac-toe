@@ -23,6 +23,7 @@ static void post_render();
 static void cleanup();
 
 /* Game variables */
+Game* global_game;
 bool reset_game = false;
 bool game_over = false;
 Board board;
@@ -63,6 +64,7 @@ int main(void)
 	/* Optional extra functions */
 	game_loop.post_render = post_render;
 	game_loop.cleanup = cleanup;
+	global_game = &game_loop;
 
 	/* Start the game loop */
 	game_loop.Start();
@@ -73,7 +75,7 @@ int main(void)
 void update_game_over_scene_position(Game& game)
 {
 	/* Make sure that the game over text is centered */
-	int height = game.window->dimensions.y / 2.0 - 32;
+	int height = game.window->dimensions.y / 2.0 - 64;
 	game_over_text.rect = Vector2(game.window->dimensions.x / 2.0 - game_over_text.textComponent.text.size() * 19, height).ToInt();
 	restart_text.rect 	= Vector2(game.window->dimensions.x / 2.0 - 240, height + 64).ToInt();
 }
@@ -95,6 +97,27 @@ void reset_board_colors()
 	}
 }
 
+void center_game_board(Game* game)
+{
+	int left_most_position 	= game->window->dimensions.x / 2.0f - (TILE_SIZE * board.dimensions.x) / 2.0f;
+	int top_most_position 	= game->window->dimensions.y / 2.0f - (TILE_SIZE * board.dimensions.y) / 2.0f;
+	for (int i = 0; i < board.dimensions.x; ++i)
+	{
+		for (int j = 0; j < board.dimensions.y; ++j)
+		{
+			board_tile_entities[i][j].rect.x = left_most_position + i * TILE_SIZE;
+			board_tile_entities[i][j].rect.y = top_most_position + j * TILE_SIZE;
+		}
+	}
+}
+
+void OnWindowResize(Window& window)
+{
+	/* Center the game board if the window has been resized */
+	center_game_board(global_game);
+}
+
+
 /* start() is called before the game loop starts.
  * Useful for doing stuff that will only run once before
  * the game starts */
@@ -103,6 +126,8 @@ void start(Game& game)
 	//Splash splash(*game.window);
 	//splash.Run();
 	
+	game.window->OnWindowResize = OnWindowResize;
+
 	/* Load any resources */
 	free_mono_big = new Font();
 	free_mono_big->LoadFont("fonts/FreeMono.ttf", 64);
@@ -147,6 +172,7 @@ void start(Game& game)
 	}
 
 	reset_board_colors();
+	center_game_board(&game);
 
 	/* Add the board tile entities to the board scene */
 	for (size_t i = 0; i < board_tile_entities.size(); ++i)
