@@ -144,13 +144,14 @@ void OnWindowResize(Window& window)
  * the game starts */
 void start(Game& game)
 {
+	assets.InitializeBundledAssets();
+
 	Splash splash(*game.window);
 	splash.Run();
 	
 	game.window->OnWindowResize = OnWindowResize;
 
 	/* Load any resources */
-	assets.InitializeBundledAssets();
 	free_mono_big = new Font();
 	free_mono_big->LoadFont("fonts/FreeMono.ttf", 64);
 
