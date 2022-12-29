@@ -58,7 +58,7 @@ Scene game_over_scene;
 Entity game_over_text;
 Entity restart_text;
 
-int main(void)
+int main(int argc, char** argv)
 {
 	Game::WindowOpts window_options;
 	window_options.title 				= "Tic-Tac-Toe";
