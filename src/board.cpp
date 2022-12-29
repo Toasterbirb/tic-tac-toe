@@ -67,7 +67,6 @@ int Board::check_win() const
 
 			if (counter >= 3)
 			{
-				std::cout << "Vertical line" << std::endl;
 				return player;
 			}
 		}
@@ -99,7 +98,6 @@ int Board::check_win() const
 
 			if (counter >= 3)
 			{
-				std::cout << "Horizontal line" << std::endl;
 				return player;
 			}
 		}

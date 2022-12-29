@@ -200,7 +200,6 @@ void input(Game& game)
 				{
 					human_move = Vector2Int(i, j);
 					result_found = true;
-					std::cout << "Picked tile: " << human_move << std::endl;
 					break;
 				}
 			}
