@@ -144,8 +144,8 @@ void OnWindowResize(Window& window)
  * the game starts */
 void start(Game& game)
 {
-	//Splash splash(*game.window);
-	//splash.Run();
+	Splash splash(*game.window);
+	splash.Run();
 	
 	game.window->OnWindowResize = OnWindowResize;
 
