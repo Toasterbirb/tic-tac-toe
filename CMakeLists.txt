@@ -1,8 +1,8 @@
 cmake_minimum_required(VERSION 3.12)
 
-set(PROGRAM_NAME birb_project)
+set(PROGRAM_NAME tic-tac-toe)
 
-project(template_project
+project(Tic-Tac-Toe
 VERSION 1.0
 LANGUAGES CXX)
 

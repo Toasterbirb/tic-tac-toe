@@ -53,7 +53,7 @@ Entity restart_text;
 int main(void)
 {
 	Game::WindowOpts window_options;
-	window_options.title 				= "Game";
+	window_options.title 				= "Tic-Tac-Toe";
 	window_options.window_dimensions 	= { 1280, 720 };
 	window_options.refresh_rate 		= 75;
 	window_options.resizable 			= true;
