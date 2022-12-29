@@ -24,6 +24,7 @@ static void cleanup();
 
 /* Game variables */
 Game* global_game;
+int legal_moves_left = 1;
 bool reset_game = false;
 bool game_over = false;
 Board board;
@@ -230,6 +231,14 @@ void update(Game& game)
 		reset_board_colors();
 	}
 
+	/* Check if there are any legal moves left */
+	if (legal_moves_left == 0)
+	{
+		game_over_text.SetText("Draw!");
+		game_over = true;
+		game_over_scene.Activate();
+	}
+
 	/* Make move */
 	if (!game_over)
 	{
@@ -288,7 +297,11 @@ void render(Game& game)
  * and waiting to maintain the correct frame rate */
 void post_render()
 {
-
+	legal_moves_left = 0;
+	for (int i = 0; i < board.dimensions.x; ++i)
+		for (int j = 0; j < board.dimensions.y; ++j)
+			if (board.is_legal_move({i, j}))
+				++legal_moves_left;
 }
 
 /* cleanup() gets called after the game loop has finished running
