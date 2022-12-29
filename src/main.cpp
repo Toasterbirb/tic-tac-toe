@@ -43,7 +43,13 @@ Color tile_colors[2] = {
 	Colors::Nord::PolarNight::nord1,
 	Colors::Nord::PolarNight::nord2
 };
+Color tile_shadow_colors[2] = {
+	0x313845,
+	0x303542,
+};
 std::vector<std::vector<Entity>> board_tile_entities;
+std::vector<Rect> board_tile_shadows;
+float board_shadow_size = 10;
 
 /* Game over screen */
 Font* free_mono_big;
@@ -95,6 +101,9 @@ void reset_board_colors()
 			else
 				cur_color = 0;
 		}
+
+		/* Set the shadow color */
+		board_tile_shadows[i].color = tile_shadow_colors[cur_color];
 	}
 }
 
@@ -109,6 +118,14 @@ void center_game_board(Game* game)
 			board_tile_entities[i][j].rect.x = left_most_position + i * TILE_SIZE;
 			board_tile_entities[i][j].rect.y = top_most_position + j * TILE_SIZE;
 		}
+	}
+
+
+	int bottop_most_position = game->window->dimensions.y / 2.0f + (TILE_SIZE * board.dimensions.y) / 2.0f;
+	for (int i = 0; i < board.dimensions.x; ++i)
+	{
+		board_tile_shadows[i].x = left_most_position + i * TILE_SIZE;
+		board_tile_shadows[i].y = bottop_most_position;
 	}
 }
 
@@ -170,7 +187,11 @@ void start(Game& game)
 			Entity board_tile("Board tile", tile_rect, 1);
 			board_tile_entities[i].push_back(board_tile);
 		}
+
+		/* Generate board tile shadows */
+		board_tile_shadows.push_back(Rect(i * TILE_SIZE, 0, TILE_SIZE, TILE_SIZE / board_shadow_size));
 	}
+
 
 	reset_board_colors();
 	center_game_board(&game);
@@ -179,6 +200,10 @@ void start(Game& game)
 	for (size_t i = 0; i < board_tile_entities.size(); ++i)
 		for (size_t j = 0; j < board_tile_entities[i].size(); ++j)
 			board_scene.AddObject(&board_tile_entities[i][j]);
+
+	/* Add the board shadow into the board scene */
+	for (size_t i = 0; i < board_tile_shadows.size(); ++i)
+		board_scene.AddObject(&board_tile_shadows[i]);
 }
 
 /* input() is called at the beginning of the frame
