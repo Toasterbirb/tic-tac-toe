@@ -1,9 +1,13 @@
 #!/bin/sh
 
-BUILD_DIR="./build"
+# Drag and drop script for compiling Birb2D projects for
+# windows. Just copy paste the script to the root of the
+# project directory and run the script.
+#
+# A build_win directory will be created and the make
+# files generated should result in a working .exe file
 
-# Delete any existing build directories
-[ -d "$BUILD_DIR" ] && rm -rv "$BUILD_DIR"
+BUILD_DIR="./build_win"
 
 # Create a fresh build directory and move into it
 mkdir -pv "$BUILD_DIR"
